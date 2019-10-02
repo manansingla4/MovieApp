@@ -1,7 +1,6 @@
 package com.example.movieapp;
 
 import android.content.Context;
-import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,18 +10,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.movieapp.Model.Movie;
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-
-import cz.msebera.android.httpclient.Header;
 
 public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class MovieViewHolder extends RecyclerView.ViewHolder {
@@ -54,6 +46,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private boolean showShimmer = true;
     private Context mContext;
     private final int MOVIE_VIEW = 1;
+    private final int LOADING_VIEW = 0;
 
 
     MovieAdapter(ArrayList<Movie> objects, Context context) {
@@ -91,9 +84,10 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             movieViewHolder.mGenre.setBackground(null);
 
             Movie movie = mMovies.get(position);
-            movieViewHolder.mName.setText(movie.getName());
+            movieViewHolder.mName.setText(movie.getTitle());
             movieViewHolder.mRating.setText(movie.getRating());
             movieViewHolder.mRelease.setText(movie.getReleaseYear());
+            movieViewHolder.mGenre.setText(movie.getGenre());
             Picasso.with(mContext)
                     .load(movie.getPosterUrl())
                     .placeholder(R.drawable.poster_show_loading)
@@ -112,7 +106,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemViewType(int position) {
         if (position == mMovies.size() - 1) {
-            return 0;
+            return LOADING_VIEW;
         }
         return MOVIE_VIEW;
     }

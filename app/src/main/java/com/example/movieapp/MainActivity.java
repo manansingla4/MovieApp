@@ -6,19 +6,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.movieapp.Model.Movie;
+import com.example.movieapp.Model.MovieList;
+import com.example.movieapp.Values.Genre;
+import com.example.movieapp.Values.URL;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,9 +34,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initRecyclerView();
         initScrollListener();
-        loadItems();
+        LoadItems();
     }
-
 
     void initScrollListener() {
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -45,36 +44,44 @@ public class MainActivity extends AppCompatActivity {
                 super.onScrolled(recyclerView, dx, dy);
                 LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
                 if (!isLoading && layoutManager != null && layoutManager.findLastVisibleItemPosition() == mMovies.size() - 1) {
-                    loadItems();
+                    LoadItems();
                     isLoading = true;
                 }
             }
         });
     }
 
-    void loadItems() {
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(URL.getUrl_popular(page), new JsonHttpResponseHandler() {
+    void LoadItems() {
+        TmdbClient client = MyRetrofit.getRetrofitInstance().create(TmdbClient.class);
+        Call<MovieList> call = client.getPopularMovies(URL.getApiKey(), page);
+
+        call.enqueue(new Callback<MovieList>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                try {
-                    JSONArray results = response.getJSONArray("results");
-                    for (int i = 0; i < results.length(); i++) {
-                        mMovies.add(Movie.getMovie(results.getJSONObject(i)));
+            public void onResponse(Call<MovieList> call, Response<MovieList> response) {
+                if (response.isSuccessful()) {
+                    List<Movie> movies = response.body().getMovies();
+                    if(!mMovies.isEmpty()) mMovies.remove(mMovies.size()-1);
+                    for(Movie m : movies) {
+                        m.setPosterUrl(URL.getPosterUrl(m.getPosterUrl()));
+                        m.setReleaseYear(m.getReleaseYear().substring(0,4));
+                        String genres = "";
+                        for(int i=0;i<m.getGenreIds().length;i++) {
+                            if(i!=0) genres = genres.concat(", ");
+                            genres = genres.concat(Genre.getGenre(m.getGenreIds()[i]));
+                        }
+                        System.out.println(genres);
+                        m.setGenre(genres);
+                        mMovies.add(m);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    mMovies.add(null);
+                    notifyAdapter();
+                    isLoading = false;
+                    if (page < 1000) page++;
                 }
-                notifyAdapter();
-                isLoading = false;
-                if(page < 1000) page++;
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Log.d("Movies", String.valueOf(errorResponse));
+            public void onFailure(Call<MovieList> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), "No connection", Toast.LENGTH_LONG).show();
             }
         });
