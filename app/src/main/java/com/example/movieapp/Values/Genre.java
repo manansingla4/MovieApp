@@ -23,6 +23,14 @@ public class Genre {
             case 53 : res = "Thriller"; break;
             case 10752 : res = "War"; break;
             case 37 : res = "Western"; break;
+            case 10759 : res = "Action & Adventure"; break;
+            case 10762: res = "Kids"; break;
+            case 10763 : res = "News"; break;
+            case 10764 : res = "Reality"; break;
+            case 10765 : res = "Sci-Fi & Fantasy"; break;
+            case 10766 : res = "Soap"; break;
+            case 10767 : res = "Talk"; break;
+            case 10768 : res = "War & Politics"; break;
         }
         return res;
     }

@@ -1,4 +1,4 @@
-package com.example.movieapp;
+package com.example.movieapp.Adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.movieapp.Model.Movie;
+import com.example.movieapp.R;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.squareup.picasso.Picasso;
 
@@ -49,7 +50,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private final int LOADING_VIEW = 0;
 
 
-    MovieAdapter(ArrayList<Movie> objects, Context context) {
+    public MovieAdapter(ArrayList<Movie> objects, Context context) {
         mMovies = objects;
         this.mContext = context;
     }
@@ -111,7 +112,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return MOVIE_VIEW;
     }
 
-    void setShowShimmer(boolean showShimmer) {
+    public void setShowShimmer(boolean showShimmer) {
         this.showShimmer = showShimmer;
     }
 }

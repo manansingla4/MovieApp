@@ -2,10 +2,10 @@ package com.example.movieapp.Model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Movie {
-    @SerializedName("title")
+public class TvShow {
+    @SerializedName("name")
     private String mTitle;
-    @SerializedName("release_date")
+    @SerializedName("first_air_date")
     private String mReleaseYear;
     @SerializedName("vote_average")
     private String mRating;

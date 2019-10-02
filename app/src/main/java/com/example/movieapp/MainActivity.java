@@ -2,100 +2,66 @@ package com.example.movieapp;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
-
-import com.example.movieapp.Model.Movie;
-import com.example.movieapp.Model.MovieList;
-import com.example.movieapp.Values.Genre;
-import com.example.movieapp.Values.URL;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
-
-    RecyclerView mRecyclerView;
-    ArrayList<Movie> mMovies = new ArrayList<>();
-    MovieAdapter mAdapter = new MovieAdapter(mMovies, this);
-    private boolean isLoading = false;
-    private int page = 1;
+    private DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initRecyclerView();
-        initScrollListener();
-        LoadItems();
-    }
+        final Toolbar toolbar = findViewById(R.id.toolbar);
 
-    void initScrollListener() {
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        // showing movies fragment first
+        toolbar.setTitle("Movies");
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new MovieFragment()).commit();
+
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                if (!isLoading && layoutManager != null && layoutManager.findLastVisibleItemPosition() == mMovies.size() - 1) {
-                    LoadItems();
-                    isLoading = true;
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.nav_movies:
+                        toolbar.setTitle("Movies");
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new MovieFragment()).commit();
+                        break;
+                    case R.id.nav_tv_shows:
+                        toolbar.setTitle("TV Shows");
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new TvShowFragment()).commit();
+                        break;
                 }
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                return true;
             }
         });
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+
+        navigationView.setCheckedItem(R.id.nav_movies);
     }
 
-    void LoadItems() {
-        TmdbClient client = MyRetrofit.getRetrofitInstance().create(TmdbClient.class);
-        Call<MovieList> call = client.getPopularMovies(URL.getApiKey(), page);
-
-        call.enqueue(new Callback<MovieList>() {
-            @Override
-            public void onResponse(Call<MovieList> call, Response<MovieList> response) {
-                if (response.isSuccessful()) {
-                    List<Movie> movies = response.body().getMovies();
-                    if(!mMovies.isEmpty()) mMovies.remove(mMovies.size()-1);
-                    for(Movie m : movies) {
-                        m.setPosterUrl(URL.getPosterUrl(m.getPosterUrl()));
-                        m.setReleaseYear(m.getReleaseYear().substring(0,4));
-                        String genres = "";
-                        for(int i=0;i<m.getGenreIds().length;i++) {
-                            if(i!=0) genres = genres.concat(", ");
-                            genres = genres.concat(Genre.getGenre(m.getGenreIds()[i]));
-                        }
-                        System.out.println(genres);
-                        m.setGenre(genres);
-                        mMovies.add(m);
-                    }
-                    mMovies.add(null);
-                    notifyAdapter();
-                    isLoading = false;
-                    if (page < 1000) page++;
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MovieList> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "No connection", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    void initRecyclerView() {
-        mRecyclerView = findViewById(R.id.recycler_view);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, 0));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(mAdapter);
-    }
-
-    void notifyAdapter() {
-        mAdapter.setShowShimmer(false);
-        mAdapter.notifyDataSetChanged();
+    @Override
+    public void onBackPressed() {
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+            return;
+        }
+        super.onBackPressed();
     }
 }
