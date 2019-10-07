@@ -73,13 +73,15 @@ public class TvShowFragment extends Fragment {
 
         call.enqueue(new Callback<TvShowList>() {
             @Override
-            public void onResponse(Call<TvShowList> call, Response<TvShowList> response) {
+            public void onResponse(@NonNull Call<TvShowList> call, @NonNull Response<TvShowList> response) {
                 if (response.isSuccessful()) {
+                    assert response.body() != null;
                     List<TvShow> movies = response.body().getTvShows();
                     if (!mTvShows.isEmpty()) mTvShows.remove(mTvShows.size() - 1);
                     for (TvShow m : movies) {
                         m.setPosterUrl(URL.getPosterUrl(m.getPosterUrl()));
-                        m.setReleaseYear(m.getReleaseYear().substring(0, 4));
+                        if(!m.getReleaseYear().isEmpty())
+                            m.setReleaseYear(m.getReleaseYear().substring(0, 4));
                         String genres = "";
                         for (int i = 0; i < m.getGenreIds().length; i++) {
                             if (i != 0) genres = genres.concat(", ");
@@ -96,7 +98,7 @@ public class TvShowFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<TvShowList> call, Throwable t) {
+            public void onFailure(@NonNull Call<TvShowList> call, @NonNull Throwable t) {
                 Toast.makeText(mView.getContext(), "No connection", Toast.LENGTH_LONG).show();
             }
         });

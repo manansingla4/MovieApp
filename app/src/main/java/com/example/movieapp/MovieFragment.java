@@ -69,13 +69,15 @@ public class MovieFragment extends Fragment {
 
         call.enqueue(new Callback<MovieList>() {
             @Override
-            public void onResponse(Call<MovieList> call, Response<MovieList> response) {
+            public void onResponse(@NonNull Call<MovieList> call, @NonNull Response<MovieList> response) {
                 if (response.isSuccessful()) {
+                    assert response.body() != null;
                     List<Movie> movies = response.body().getMovies();
                     if (!mMovies.isEmpty()) mMovies.remove(mMovies.size() - 1);
                     for (Movie m : movies) {
                         m.setPosterUrl(URL.getPosterUrl(m.getPosterUrl()));
-                        m.setReleaseYear(m.getReleaseYear().substring(0, 4));
+                        if(!m.getReleaseYear().isEmpty())
+                            m.setReleaseYear(m.getReleaseYear().substring(0, 4));
                         String genres = "";
                         for (int i = 0; i < m.getGenreIds().length; i++) {
                             if (i != 0) genres = genres.concat(", ");
@@ -92,7 +94,7 @@ public class MovieFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<MovieList> call, Throwable t) {
+            public void onFailure(@NonNull Call<MovieList> call, @NonNull Throwable t) {
                 Toast.makeText(mView.getContext(), "No connection", Toast.LENGTH_LONG).show();
             }
         });
