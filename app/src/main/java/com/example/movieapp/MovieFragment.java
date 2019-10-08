@@ -15,6 +15,8 @@ import android.widget.Toast;
 import com.example.movieapp.Adapter.MovieAdapter;
 import com.example.movieapp.Model.Movie;
 import com.example.movieapp.Model.MovieList;
+import com.example.movieapp.Util.MyRetrofit;
+import com.example.movieapp.Util.TmdbClient;
 import com.example.movieapp.Values.Genre;
 import com.example.movieapp.Values.URL;
 
@@ -32,6 +34,7 @@ public class MovieFragment extends Fragment {
     private boolean isLoading = false;
     private int page = 1;
     View mView;
+    private static boolean show_popular;
 
 
     @Nullable
@@ -65,7 +68,12 @@ public class MovieFragment extends Fragment {
 
     void LoadItems() {
         TmdbClient client = MyRetrofit.getRetrofitInstance().create(TmdbClient.class);
-        Call<MovieList> call = client.getPopularMovies(URL.getApiKey(), page);
+        Call<MovieList> call;
+        if (show_popular) {
+            call = client.getPopularMovies(URL.getApiKey(), page);
+        } else {
+            call = client.getTopMovies(URL.getApiKey(), page);
+        }
 
         call.enqueue(new Callback<MovieList>() {
             @Override
@@ -110,5 +118,10 @@ public class MovieFragment extends Fragment {
     void notifyAdapter() {
         mAdapter.setShowShimmer(false);
         mAdapter.notifyDataSetChanged();
+    }
+
+
+    public static void setShow_popular(boolean show_popular) {
+        MovieFragment.show_popular = show_popular;
     }
 }

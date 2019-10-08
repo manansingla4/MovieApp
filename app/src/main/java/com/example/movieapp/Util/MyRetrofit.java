@@ -1,4 +1,4 @@
-package com.example.movieapp;
+package com.example.movieapp.Util;
 
 import com.example.movieapp.Values.URL;
 

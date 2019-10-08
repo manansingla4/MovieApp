@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.movieapp.Model.Movie;
@@ -35,11 +34,8 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     static class LoadingViewHolder extends RecyclerView.ViewHolder {
-        ProgressBar mProgressBar;
-
         LoadingViewHolder(View view) {
             super(view);
-            mProgressBar = view.findViewById(R.id.progressBar);
         }
     }
 

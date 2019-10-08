@@ -12,12 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.movieapp.Adapter.MovieAdapter;
 import com.example.movieapp.Adapter.TvShowAdapter;
-import com.example.movieapp.Model.Movie;
-import com.example.movieapp.Model.MovieList;
 import com.example.movieapp.Model.TvShow;
 import com.example.movieapp.Model.TvShowList;
+import com.example.movieapp.Util.MyRetrofit;
+import com.example.movieapp.Util.TmdbClient;
 import com.example.movieapp.Values.Genre;
 import com.example.movieapp.Values.URL;
 
@@ -35,6 +34,7 @@ public class TvShowFragment extends Fragment {
     private boolean isLoading = false;
     private int page = 1;
     View mView;
+    private static boolean show_popular;
 
 
     @Nullable
@@ -69,7 +69,12 @@ public class TvShowFragment extends Fragment {
 
     void LoadItems() {
         TmdbClient client = MyRetrofit.getRetrofitInstance().create(TmdbClient.class);
-        Call<TvShowList> call = client.getPopularTvShows(URL.getApiKey(), page);
+        Call<TvShowList> call;
+        if (show_popular) {
+            call = client.getPopularTvShows(URL.getApiKey(), page);
+        } else {
+            call = client.getTopTvShows(URL.getApiKey(), page);
+        }
 
         call.enqueue(new Callback<TvShowList>() {
             @Override
@@ -80,7 +85,7 @@ public class TvShowFragment extends Fragment {
                     if (!mTvShows.isEmpty()) mTvShows.remove(mTvShows.size() - 1);
                     for (TvShow m : movies) {
                         m.setPosterUrl(URL.getPosterUrl(m.getPosterUrl()));
-                        if(!m.getReleaseYear().isEmpty())
+                        if (!m.getReleaseYear().isEmpty())
                             m.setReleaseYear(m.getReleaseYear().substring(0, 4));
                         String genres = "";
                         for (int i = 0; i < m.getGenreIds().length; i++) {
@@ -114,5 +119,9 @@ public class TvShowFragment extends Fragment {
     void notifyAdapter() {
         mAdapter.setShowShimmer(false);
         mAdapter.notifyDataSetChanged();
+    }
+
+    public static void setShow_popular(boolean show_popular) {
+        TvShowFragment.show_popular = show_popular;
     }
 }
