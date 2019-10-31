@@ -1,4 +1,4 @@
-package com.example.movieapp;
+package com.example.movieapp.Activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,13 +11,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.movieapp.Fragments.MovieListFragment;
+import com.example.movieapp.Fragments.TvShowListFragment;
+import com.example.movieapp.R;
+
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
-    private final int MOVIES = 0;
-    private final int TV = 1;
+    public static final int MOVIES = 0;
+    public static final int TV = 1;
     private int current_fragment;
-
+    private MenuItem popular_menu_item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,26 +33,27 @@ public class MainActivity extends AppCompatActivity {
 
         initNavigationView();
         addToggleBar();
+
         current_fragment = MOVIES;
         showMovieFragment(true);
     }
 
 
     void showMovieFragment(boolean showPopular) {
-        MovieFragment.setShow_popular(showPopular);
+        MovieListFragment.setShow_popular(showPopular);
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(R.string.movies);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new MovieFragment()).commit();
+                new MovieListFragment()).commit();
     }
 
     void showTvFragment(boolean showPopular) {
-        TvShowFragment.setShow_popular(showPopular);
+        TvShowListFragment.setShow_popular(showPopular);
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(R.string.tv_shows);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new TvShowFragment()).commit();
+                .replace(R.id.fragment_container, new TvShowListFragment()).commit();
     }
 
     void initNavigationView() {
@@ -68,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                popular_menu_item.setChecked(true);
                 return true;
             }
         });
@@ -93,13 +99,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
+        popular_menu_item = menu.findItem(R.id.popular);
+        // checking the popular menu item when activity is started
+        popular_menu_item.setChecked(true);
         return true;
     }
 
 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.popular) {
+        boolean checked = item.isChecked();
+        if (!checked && id == R.id.popular) {
             switch (current_fragment) {
                 case MOVIES:
                     showMovieFragment(true);
@@ -108,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
                     showTvFragment(true);
                     break;
             }
-        }
-        if (id == R.id.top_rated) {
+        } else if (!checked && id == R.id.top_rated) {
             switch (current_fragment) {
                 case MOVIES:
                     showMovieFragment(false);
@@ -119,6 +128,11 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
+        item.setChecked(true);
         return super.onOptionsItemSelected(item);
+    }
+
+    public int getCurrent_fragment() {
+        return current_fragment;
     }
 }

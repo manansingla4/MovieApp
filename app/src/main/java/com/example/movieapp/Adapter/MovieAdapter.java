@@ -1,6 +1,8 @@
 package com.example.movieapp.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.movieapp.Activities.DetailActivity;
 import com.example.movieapp.Model.Movie;
 import com.example.movieapp.R;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -39,17 +42,27 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    static class RetryViewHolder extends RecyclerView.ViewHolder {
+        RetryViewHolder(View view) {
+            super(view);
+        }
+    }
+
     private ArrayList<Movie> mMovies;
     private boolean showShimmer = true;
     private Context mContext;
     private final int MOVIE_VIEW = 1;
     private final int LOADING_VIEW = 0;
+    private final int RETRY_VIEW = 2;
+    private boolean showRetry = false;
+    private View.OnClickListener retryClickListener;
 
 
     public MovieAdapter(ArrayList<Movie> objects, Context context) {
         mMovies = objects;
         this.mContext = context;
     }
+
 
     @NonNull
     @Override
@@ -58,6 +71,10 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.movie_card_item, parent, false);
             return new MovieViewHolder(itemView);
+        } else if (viewType == RETRY_VIEW) {
+            View itemView = LayoutInflater.from(mContext).
+                    inflate(R.layout.retry_list_item, parent, false);
+            return new RetryViewHolder(itemView);
         } else {
             View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_loading, parent, false);
@@ -67,7 +84,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (showShimmer) {
+        if (holder instanceof MovieViewHolder && showShimmer) {
             ((MovieViewHolder) holder).mShimmerFrameLayout.startShimmer();
         } else if (holder instanceof MovieViewHolder) {
             final MovieViewHolder movieViewHolder = (MovieViewHolder) holder;
@@ -80,16 +97,28 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             movieViewHolder.mRating.setBackground(null);
             movieViewHolder.mGenre.setBackground(null);
 
-            Movie movie = mMovies.get(position);
+            final Movie movie = mMovies.get(position);
             movieViewHolder.mName.setText(movie.getTitle());
             movieViewHolder.mRating.setText(movie.getRating());
             movieViewHolder.mRelease.setText(movie.getReleaseYear());
             movieViewHolder.mGenre.setText(movie.getGenre());
             Picasso.with(mContext)
-                    .load(movie.getPosterUrl())
+                    .load(movie.getBackdropURL())
                     .placeholder(R.drawable.poster_show_loading)
                     .error(R.drawable.poster_show_not_available)
                     .into(movieViewHolder.mPoster);
+            movieViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, DetailActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(DetailActivity.INTENT_KEY, movie);
+                    intent.putExtras(bundle);
+                    mContext.startActivity(intent);
+                }
+            });
+        } else if (holder instanceof RetryViewHolder) {
+            holder.itemView.setOnClickListener(retryClickListener);
         }
     }
 
@@ -102,13 +131,25 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        if (position == mMovies.size() - 1) {
+        if (showShimmer) {
+            return MOVIE_VIEW;
+        } else if (position == mMovies.size() - 1 && showRetry) {
+            return RETRY_VIEW;
+        } else if (position == mMovies.size() - 1) {
             return LOADING_VIEW;
-        }
-        return MOVIE_VIEW;
+        } else
+            return MOVIE_VIEW;
     }
 
     public void setShowShimmer(boolean showShimmer) {
         this.showShimmer = showShimmer;
+    }
+
+    public void setShowRetry(boolean showRetry) {
+        this.showRetry = showRetry;
+    }
+
+    public void setRetryClickListener(View.OnClickListener retryClickListener) {
+        this.retryClickListener = retryClickListener;
     }
 }

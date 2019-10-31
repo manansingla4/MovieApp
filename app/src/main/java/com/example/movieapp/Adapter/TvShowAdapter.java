@@ -1,6 +1,8 @@
 package com.example.movieapp.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.movieapp.Activities.DetailActivity;
 import com.example.movieapp.Model.TvShow;
 import com.example.movieapp.R;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -39,11 +42,20 @@ public class TvShowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
+    static class RetryViewHolder extends RecyclerView.ViewHolder {
+        RetryViewHolder(View view) {
+            super(view);
+        }
+    }
+
     private ArrayList<TvShow> mTvShows;
     private boolean showShimmer = true;
     private Context mContext;
-    private final int MOVIE_VIEW = 1;
+    private final int TV_SHOW_VIEW = 1;
     private final int LOADING_VIEW = 0;
+    private final int RETRY_VIEW = 2;
+    private boolean showRetry = false;
+    private View.OnClickListener retryClickListener;
 
 
     public TvShowAdapter(ArrayList<TvShow> objects, Context context) {
@@ -54,10 +66,14 @@ public class TvShowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == MOVIE_VIEW) {
+        if (viewType == TV_SHOW_VIEW) {
             View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.movie_card_item, parent, false);
             return new TvShowViewHolder(itemView);
+        } else if (viewType == RETRY_VIEW) {
+            View itemView = LayoutInflater.from(mContext).
+                    inflate(R.layout.retry_list_item, parent, false);
+            return new RetryViewHolder(itemView);
         } else {
             View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_loading, parent, false);
@@ -80,16 +96,29 @@ public class TvShowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             tvShowViewHolder.mRating.setBackground(null);
             tvShowViewHolder.mGenre.setBackground(null);
 
-            TvShow tvShow = mTvShows.get(position);
+            final TvShow tvShow = mTvShows.get(position);
             tvShowViewHolder.mName.setText(tvShow.getTitle());
             tvShowViewHolder.mRating.setText(tvShow.getRating());
             tvShowViewHolder.mRelease.setText(tvShow.getReleaseYear());
             tvShowViewHolder.mGenre.setText(tvShow.getGenre());
             Picasso.with(mContext)
-                    .load(tvShow.getPosterUrl())
+                    .load(tvShow.getBackdropURL())
                     .placeholder(R.drawable.poster_show_loading)
                     .error(R.drawable.poster_show_not_available)
                     .into(tvShowViewHolder.mPoster);
+
+            tvShowViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, DetailActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(DetailActivity.INTENT_KEY, tvShow);
+                    intent.putExtras(bundle);
+                    mContext.startActivity(intent);
+                }
+            });
+        } else if (holder instanceof RetryViewHolder) {
+            holder.itemView.setOnClickListener(retryClickListener);
         }
     }
 
@@ -102,13 +131,26 @@ public class TvShowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemViewType(int position) {
+        if (showShimmer) {
+            return TV_SHOW_VIEW;
+        } else if (position == mTvShows.size() - 1 && showRetry) {
+            return RETRY_VIEW;
+        }
         if (position == mTvShows.size() - 1) {
             return LOADING_VIEW;
         }
-        return MOVIE_VIEW;
+        return TV_SHOW_VIEW;
     }
 
     public void setShowShimmer(boolean showShimmer) {
         this.showShimmer = showShimmer;
+    }
+
+    public void setShowRetry(boolean showRetry) {
+        this.showRetry = showRetry;
+    }
+
+    public void setRetryClickListener(View.OnClickListener retryClickListener) {
+        this.retryClickListener = retryClickListener;
     }
 }

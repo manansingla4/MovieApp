@@ -7,4 +7,20 @@
     <string name="movies">Movies</string>
     <string name="tv_shows">TV Shows</string>
     <string name="nav_header_title">Movie App</string>
+
+
+    <string name="retry">Retry</string>
+    <string name="no_connection">No Connection</string>
+    <string name="check_internet">Please check your internet connectivity and try again</string>
+    <string name="could_not_load_content">Could not load content</string>
+
+
+    <string name="movie_details">Movie Details</string>
+    <string name="plot">Plot Synopsis</string>
+    <string name="rating">User Rating</string>
+    <string name="release">Release Date</string>
+    <string name="name_movie">Movie Title</string>
+
+    <string name="sort_menu">Sort Menu</string>
+
 </resources>
