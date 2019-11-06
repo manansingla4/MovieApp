@@ -24,5 +24,11 @@ public interface TmdbClient {
     Call<TvShowList> getTopTvShows(@Query("api_key") String API_KEY,
                                    @Query("page") int page);
 
+    @GET("/3/search/movie?adult=0")
+    Call<MovieList> searchMovies(@Query("api_key") String API_KEY,
+                                 @Query("query") String queryString);
 
+    @GET("/3/search/tv")
+    Call<TvShowList> searchTvShows(@Query("api_key") String API_KEY,
+                                   @Query("query") String queryString);
 }

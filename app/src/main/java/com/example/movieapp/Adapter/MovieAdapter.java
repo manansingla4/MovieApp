@@ -135,7 +135,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return MOVIE_VIEW;
         } else if (position == mMovies.size() - 1 && showRetry) {
             return RETRY_VIEW;
-        } else if (position == mMovies.size() - 1) {
+        } else if (mMovies.get(position) == null) {
             return LOADING_VIEW;
         } else
             return MOVIE_VIEW;

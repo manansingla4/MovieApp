@@ -87,7 +87,7 @@ public class Movie implements Serializable, Watchable {
     }
 
     public String getReleaseYear() {
-        if (!mReleaseYear.isEmpty())
+        if (mReleaseYear != null && !mReleaseYear.isEmpty())
             return mReleaseYear.substring(0, 4);
         return "";
     }

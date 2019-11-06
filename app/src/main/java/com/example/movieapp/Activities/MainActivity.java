@@ -1,5 +1,6 @@
 package com.example.movieapp.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -70,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_tv_shows:
                         current_fragment = TV;
                         showTvFragment(true);
+                        break;
+                    case R.id.search_drawer_item:
+                        // check whether getApplicationContext can be replace with something else
+                        startActivity(new Intent(getApplicationContext(), SearchActivity.class));
                         break;
                 }
                 mDrawerLayout.closeDrawer(GravityCompat.START);

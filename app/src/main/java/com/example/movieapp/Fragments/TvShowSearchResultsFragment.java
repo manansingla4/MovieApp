@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.movieapp.Adapter.TvShowAdapter;
+import com.example.movieapp.Interfaces.Observer;
 import com.example.movieapp.Model.TvShow;
 import com.example.movieapp.Model.TvShowList;
 import com.example.movieapp.R;
@@ -27,15 +28,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TvShowListFragment extends Fragment {
+public class TvShowSearchResultsFragment extends Fragment implements Observer {
     RecyclerView mRecyclerView;
     ArrayList<TvShow> mTvShows = new ArrayList<>();
     TvShowAdapter mAdapter;
-    private boolean isLoading = false;
-    private int page = 1;
+    String currentQuery = "";
     View mView;
-    private static boolean show_popular;
-
 
     @Nullable
     @Override
@@ -48,51 +46,28 @@ public class TvShowListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
         mAdapter = new TvShowAdapter(mTvShows, mView.getContext());
-        mAdapter.setRetryClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdapter.setShowRetry(false);
-                mAdapter.notifyItemChanged(mTvShows.size() - 1);
-                LoadItems();
-            }
-        });
+        mAdapter.setShowShimmer(false);
         initRecyclerView();
-        initScrollListener();
-        LoadItems();
-    }
-
-    void initScrollListener() {
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                if (!isLoading && layoutManager != null &&
-                        layoutManager.findLastVisibleItemPosition() == mTvShows.size() - 1) {
-                    LoadItems();
-                    isLoading = true;
-                }
-            }
-        });
     }
 
     void LoadItems() {
+        if (currentQuery.isEmpty()) {
+            mTvShows.clear();
+            notifyAdapter();
+            return;
+        }
         TmdbClient client = MyRetrofit.getRetrofitInstance().create(TmdbClient.class);
         Call<TvShowList> call;
-        if (show_popular) {
-            call = client.getPopularTvShows(URL.getApiKey(), page);
-        } else {
-            call = client.getTopTvShows(URL.getApiKey(), page);
-        }
+        call = client.searchTvShows(URL.getApiKey(), currentQuery);
 
         call.enqueue(new Callback<TvShowList>() {
             @Override
             public void onResponse(@NonNull Call<TvShowList> call, @NonNull Response<TvShowList> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null;
-                    List<TvShow> movies = response.body().getTvShows();
-                    if (!mTvShows.isEmpty()) mTvShows.remove(mTvShows.size() - 1);
-                    for (TvShow m : movies) {
+                    mTvShows.clear();
+                    List<TvShow> tvShows = response.body().getTvShows();
+                    for (TvShow m : tvShows) {
                         String genres = "";
                         for (int i = 0; i < m.getGenreIds().length; i++) {
                             if (i != 0) genres = genres.concat(", ");
@@ -101,24 +76,12 @@ public class TvShowListFragment extends Fragment {
                         m.setGenre(genres);
                         mTvShows.add(m);
                     }
-                    mTvShows.add(null);
                     notifyAdapter();
-                    isLoading = false;
-                    if (page < 1000) page++;
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<TvShowList> call, @NonNull Throwable t) {
-                if (page == 1) {
-                    getActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, new RetryFragment())
-                            .commit();
-                } else {
-                    mAdapter.setShowRetry(true);
-                    mAdapter.notifyItemChanged(mTvShows.size() - 1);
-                }
             }
         });
     }
@@ -131,11 +94,12 @@ public class TvShowListFragment extends Fragment {
     }
 
     void notifyAdapter() {
-        mAdapter.setShowShimmer(false);
         mAdapter.notifyDataSetChanged();
     }
 
-    public static void setShow_popular(boolean show_popular) {
-        TvShowListFragment.show_popular = show_popular;
+    @Override
+    public void update(String query) {
+        currentQuery = query;
+        LoadItems();
     }
 }

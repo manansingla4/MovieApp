@@ -136,7 +136,7 @@ public class TvShowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         } else if (position == mTvShows.size() - 1 && showRetry) {
             return RETRY_VIEW;
         }
-        if (position == mTvShows.size() - 1) {
+        if (mTvShows.get(position) == null) {
             return LOADING_VIEW;
         }
         return TV_SHOW_VIEW;
