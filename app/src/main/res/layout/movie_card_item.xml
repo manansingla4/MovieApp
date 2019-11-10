@@ -69,7 +69,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:background="@color/shimmer_bg"
-                        android:drawableEnd="@drawable/ic_star_black_24dp"
+                        android:drawableEnd="@drawable/ic_star"
                         android:drawablePadding="4dp"
                         tools:text="7.3" />
 

@@ -5,7 +5,7 @@ public interface Watchable {
 
     public Integer[] getGenreIds();
 
-    public String getPosterUrl();
+    public String getRelativePosterUrl();
 
     public String getBackdropURL();
 
@@ -18,4 +18,8 @@ public interface Watchable {
     public String getId();
 
     public String getReleaseYear();
+
+    public String getReleaseDate();
+
+    public String getRelativeBackdropURL();
 }

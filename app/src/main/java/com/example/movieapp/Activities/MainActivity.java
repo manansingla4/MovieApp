@@ -1,5 +1,6 @@
 package com.example.movieapp.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,12 +23,14 @@ public class MainActivity extends AppCompatActivity {
     public static final int MOVIES = 0;
     public static final int TV = 1;
     private int current_fragment;
+    private Context mContext;
     private MenuItem popular_menu_item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -73,8 +76,10 @@ public class MainActivity extends AppCompatActivity {
                         showTvFragment(true);
                         break;
                     case R.id.search_drawer_item:
-                        // check whether getApplicationContext can be replace with something else
-                        startActivity(new Intent(getApplicationContext(), SearchActivity.class));
+                        startActivity(new Intent(mContext, SearchActivity.class));
+                        break;
+                    case R.id.favourite_drawer_item:
+                        startActivity(new Intent(mContext, FavouriteActivity.class));
                         break;
                 }
                 mDrawerLayout.closeDrawer(GravityCompat.START);

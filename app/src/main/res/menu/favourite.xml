@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_search"
-        android:title="@string/search"
-        app:actionViewClass="android.support.v7.widget.SearchView"
+        android:id="@+id/menu_favorite"
+        android:icon="@drawable/ic_favorite_border_white"
+        android:title="@string/favourite"
         app:showAsAction="always" />
-
 </menu>

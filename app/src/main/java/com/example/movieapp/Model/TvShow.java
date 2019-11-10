@@ -7,22 +7,32 @@ import java.io.Serializable;
 
 public class TvShow implements Serializable, Watchable {
     @SerializedName("first_air_date")
-    private String mReleaseYear;
+    private String mReleaseDate;
     @SerializedName("name")
     private String mTitle;
     @SerializedName("vote_average")
     private String mRating;
     private String mGenre;
     @SerializedName("poster_path")
-    private String mPosterUrl;
+    private String mReativePosterUrl;
     @SerializedName("backdrop_path")
-    private String mBackdropURL;
+    private String mRelativeBackdropURL;
     @SerializedName("id")
     private String mId;
     @SerializedName("genre_ids")
     private Integer[] mGenreIds;
     @SerializedName("overview")
     private String synopsis;
+
+
+    @Override
+    public String getRelativeBackdropURL() {
+        return mRelativeBackdropURL;
+    }
+
+    public void setRelativeBackdropURL(String relativeBackdropURL) {
+        mRelativeBackdropURL = relativeBackdropURL;
+    }
 
     public String getSynopsis() {
         return synopsis;
@@ -36,12 +46,12 @@ public class TvShow implements Serializable, Watchable {
         return mGenreIds;
     }
 
-    public String getPosterUrl() {
-        return URL.getPosterUrl(mPosterUrl);
+    public String getRelativePosterUrl() {
+        return mReativePosterUrl;
     }
 
     public String getBackdropURL() {
-        return URL.getPosterUrl(mBackdropURL);
+        return URL.getPosterUrl(mRelativeBackdropURL);
     }
 
     public String getTitle() {
@@ -74,9 +84,6 @@ public class TvShow implements Serializable, Watchable {
         mGenre = genre;
     }
 
-    public void setPosterUrl(String posterUrl) {
-        mPosterUrl = posterUrl;
-    }
 
     public void setId(String id) {
         mId = id;
@@ -87,12 +94,17 @@ public class TvShow implements Serializable, Watchable {
     }
 
     public String getReleaseYear() {
-        if (mReleaseYear != null && !mReleaseYear.isEmpty())
-            return mReleaseYear.substring(0, 4);
+        if (mReleaseDate != null && !mReleaseDate.isEmpty())
+            return mReleaseDate.substring(0, 4);
         return "";
     }
 
-    public void setReleaseYear(String releaseYear) {
-        mReleaseYear = releaseYear;
+    public String getReleaseDate() {
+        return mReleaseDate;
     }
+
+    public void setReleaseDate(String releaseDate) {
+        mReleaseDate = releaseDate;
+    }
+
 }

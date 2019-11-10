@@ -7,22 +7,39 @@ import java.io.Serializable;
 
 public class Movie implements Serializable, Watchable {
     @SerializedName("release_date")
-    private String mReleaseYear;
+    private String mReleaseDate;
     @SerializedName("title")
     private String mTitle;
     @SerializedName("vote_average")
     private String mRating;
     private String mGenre;
     @SerializedName("poster_path")
-    private String mPosterUrl;
+    private String mRelativePosterUrl;
     @SerializedName("backdrop_path")
-    private String mBackdropURL;
+    private String mRelativeBackdropURL;
+
+    public String getRelativeBackdropURL() {
+        return mRelativeBackdropURL;
+    }
+
+    public void setRelativeBackdropURL(String relativeBackdropURL) {
+        mRelativeBackdropURL = relativeBackdropURL;
+    }
+
     @SerializedName("id")
     private String mId;
     @SerializedName("genre_ids")
     private Integer[] mGenreIds;
     @SerializedName("overview")
     private String synopsis;
+
+    public void setReleaseDate(String releaseDate) {
+        mReleaseDate = releaseDate;
+    }
+
+    public String getReleaseDate() {
+        return mReleaseDate;
+    }
 
     public String getSynopsis() {
         return synopsis;
@@ -36,13 +53,14 @@ public class Movie implements Serializable, Watchable {
         return mGenreIds;
     }
 
-    public String getPosterUrl() {
-        return URL.getPosterUrl(mPosterUrl);
+    public String getRelativePosterUrl() {
+        return mRelativePosterUrl;
     }
 
     public String getBackdropURL() {
-        return URL.getPosterUrl(mBackdropURL);
+        return URL.getPosterUrl(mRelativeBackdropURL);
     }
+
 
     public String getTitle() {
         return mTitle;
@@ -74,8 +92,8 @@ public class Movie implements Serializable, Watchable {
         mGenre = genre;
     }
 
-    public void setPosterUrl(String posterUrl) {
-        mPosterUrl = posterUrl;
+    public void setRelativePosterUrl(String relativePosterUrl) {
+        mRelativePosterUrl = relativePosterUrl;
     }
 
     public void setId(String id) {
@@ -87,12 +105,9 @@ public class Movie implements Serializable, Watchable {
     }
 
     public String getReleaseYear() {
-        if (mReleaseYear != null && !mReleaseYear.isEmpty())
-            return mReleaseYear.substring(0, 4);
+        if (mReleaseDate != null && !mReleaseDate.isEmpty())
+            return mReleaseDate.substring(0, 4);
         return "";
     }
 
-    public void setReleaseYear(String releaseYear) {
-        mReleaseYear = releaseYear;
-    }
 }
