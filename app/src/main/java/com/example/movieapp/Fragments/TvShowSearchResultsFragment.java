@@ -34,6 +34,7 @@ public class TvShowSearchResultsFragment extends Fragment implements Observer {
     TvShowAdapter mAdapter;
     String currentQuery = "";
     View mView;
+    Call currentCall;
 
     @Nullable
     @Override
@@ -51,15 +52,17 @@ public class TvShowSearchResultsFragment extends Fragment implements Observer {
     }
 
     void LoadItems() {
+        if (currentCall != null) {
+            currentCall.cancel();
+        }
         if (currentQuery.isEmpty()) {
             mTvShows.clear();
             notifyAdapter();
             return;
         }
         TmdbClient client = MyRetrofit.getRetrofitInstance().create(TmdbClient.class);
-        Call<TvShowList> call;
-        call = client.searchTvShows(URL.getApiKey(), currentQuery);
-
+        Call<TvShowList> call = client.searchTvShows(URL.getApiKey(), currentQuery);
+        currentCall = call;
         call.enqueue(new Callback<TvShowList>() {
             @Override
             public void onResponse(@NonNull Call<TvShowList> call, @NonNull Response<TvShowList> response) {

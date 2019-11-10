@@ -35,6 +35,7 @@ public class MovieSearchResultsFragment extends Fragment implements Observer {
     MovieAdapter mAdapter;
     String currentQuery = "";
     View mView;
+    Call currentCall;
 
     @Nullable
     @Override
@@ -52,15 +53,17 @@ public class MovieSearchResultsFragment extends Fragment implements Observer {
     }
 
     void LoadItems() {
+        if (currentCall != null) {
+            currentCall.cancel();
+        }
         if (currentQuery.isEmpty()) {
             mMovies.clear();
             notifyAdapter();
             return;
         }
         TmdbClient client = MyRetrofit.getRetrofitInstance().create(TmdbClient.class);
-        Call<MovieList> call;
-        call = client.searchMovies(URL.getApiKey(), currentQuery);
-
+        Call<MovieList> call = client.searchMovies(URL.getApiKey(), currentQuery);
+        currentCall = call;
         call.enqueue(new Callback<MovieList>() {
             @Override
             public void onResponse(@NonNull Call<MovieList> call, @NonNull Response<MovieList> response) {
