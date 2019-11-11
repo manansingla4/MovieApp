@@ -8,16 +8,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.slider.library.Indicators.PagerIndicator;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.example.movieapp.DataBaseHelper;
+import com.example.movieapp.Model.BackDrop;
+import com.example.movieapp.Model.BackDropList;
 import com.example.movieapp.Model.Movie;
 import com.example.movieapp.Model.TvShow;
 import com.example.movieapp.Model.Watchable;
 import com.example.movieapp.R;
-import com.squareup.picasso.Picasso;
+import com.example.movieapp.Util.MyRetrofit;
+import com.example.movieapp.Util.TmdbClient;
+import com.example.movieapp.Util.URL;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -25,7 +39,6 @@ public class DetailActivity extends AppCompatActivity {
     private DataBaseHelper mDataBaseHelper;
     private Watchable mWatchable;
     private TextView mName, plotSynopsis, userRating, releaseDate;
-    private ImageView mImageView;
     public static final String INTENT_KEY = "watchable";
 
     @Override
@@ -34,7 +47,6 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         mDataBaseHelper = new DataBaseHelper(this);
         mName = findViewById(R.id.movie_title);
-        mImageView = findViewById(R.id.thumbnail_image_header);
         plotSynopsis = findViewById(R.id.plot_synopsis);
         userRating = findViewById(R.id.user_rating);
         releaseDate = findViewById(R.id.release_date);
@@ -55,15 +67,11 @@ public class DetailActivity extends AppCompatActivity {
             mWatchable = (Watchable) bundle.getSerializable(INTENT_KEY);
         }
         if (mWatchable != null) {
+            loadImages();
             mName.setText(mWatchable.getTitle());
             plotSynopsis.setText(mWatchable.getSynopsis());
             userRating.setText(mWatchable.getRating());
             releaseDate.setText(mWatchable.getReleaseYear());
-            Picasso.with(this)
-                    .load(mWatchable.getBackdropURL())
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.poster_show_not_available)
-                    .into(mImageView);
         }
     }
 
@@ -151,4 +159,52 @@ public class DetailActivity extends AppCompatActivity {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
+    private void loadImages() {
+
+        final SliderLayout sliderLayout = findViewById(R.id.slider);
+        sliderLayout.stopAutoCycle();
+        PagerIndicator indicator = findViewById(R.id.custom_indicator);
+        sliderLayout.setCustomIndicator(indicator);
+        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Accordion);
+
+        Retrofit retrofit = MyRetrofit.getRetrofitInstance();
+        TmdbClient client = retrofit.create(TmdbClient.class);
+        Call<BackDropList> call;
+        if (mWatchable.getClass() == Movie.class) {
+            call = client.getBackDrops(URL.getBaseUrl() + "3/movie/" + mWatchable.getId() +
+                    "/images?api_key=" + URL.getApiKey());
+        } else {
+            call = client.getBackDrops(URL.getBaseUrl() + "3/tv/" + mWatchable.getId() +
+                    "/images?api_key=" + URL.getApiKey());
+        }
+
+        call.enqueue(new Callback<BackDropList>() {
+            @Override
+            public void onResponse(Call<BackDropList> call, Response<BackDropList> response) {
+                if (response.isSuccessful()) {
+                    List<BackDrop> backDrops = response.body().getBackDrops();
+                    if (backDrops.size() == 0) {
+                        DefaultSliderView defaultSliderView = new DefaultSliderView(getApplicationContext());
+                        defaultSliderView.image(R.drawable.poster_show_not_available)
+                                .setScaleType(BaseSliderView.ScaleType.Fit);
+                        sliderLayout.addSlider(defaultSliderView);
+                    }
+                    for (int i = 0; i < 10 && i < backDrops.size(); i++) {
+                        DefaultSliderView defaultSliderView = new DefaultSliderView(getApplicationContext());
+                        defaultSliderView.image(backDrops.get(i).getUrl())
+                                .setScaleType(BaseSliderView.ScaleType.Fit);
+                        sliderLayout.addSlider(defaultSliderView);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BackDropList> call, Throwable t) {
+                DefaultSliderView defaultSliderView = new DefaultSliderView(getApplicationContext());
+                defaultSliderView.image(R.drawable.poster_show_not_available)
+                        .setScaleType(BaseSliderView.ScaleType.Fit);
+                sliderLayout.addSlider(defaultSliderView);
+            }
+        });
+    }
 }
