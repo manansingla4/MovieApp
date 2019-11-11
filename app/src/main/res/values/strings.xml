@@ -19,7 +19,7 @@
     <string name="plot">Plot Synopsis</string>
     <string name="rating">User Rating</string>
     <string name="release">Release Date</string>
-    <string name="name_movie">Movie Title</string>
+    <string name="name">Title</string>
 
     <string name="sort_menu">Sort Menu</string>
     <string name="search">Search</string>

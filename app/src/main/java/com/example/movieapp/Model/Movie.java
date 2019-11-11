@@ -1,6 +1,6 @@
 package com.example.movieapp.Model;
 
-import com.example.movieapp.Values.URL;
+import com.example.movieapp.Util.URL;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;

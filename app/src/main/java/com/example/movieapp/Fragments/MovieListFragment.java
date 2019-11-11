@@ -15,10 +15,10 @@ import com.example.movieapp.Adapter.MovieAdapter;
 import com.example.movieapp.Model.Movie;
 import com.example.movieapp.Model.MovieList;
 import com.example.movieapp.R;
+import com.example.movieapp.Util.Genre;
 import com.example.movieapp.Util.MyRetrofit;
 import com.example.movieapp.Util.TmdbClient;
-import com.example.movieapp.Values.Genre;
-import com.example.movieapp.Values.URL;
+import com.example.movieapp.Util.URL;
 
 import java.util.ArrayList;
 import java.util.List;

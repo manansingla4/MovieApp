@@ -1,4 +1,4 @@
-package com.example.movieapp.Values;
+package com.example.movieapp.Util;
 
 public class Genre {
     public static String getGenre(int id) {

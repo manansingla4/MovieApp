@@ -1,7 +1,5 @@
 package com.example.movieapp.Util;
 
-import com.example.movieapp.Values.URL;
-
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

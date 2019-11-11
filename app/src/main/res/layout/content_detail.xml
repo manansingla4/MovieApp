@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/name_movie"
+            android:text="@string/name"
             android:textAlignment="center"
             android:textSize="25sp"
             android:textStyle="bold" />
@@ -30,7 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_margin_top"
             android:padding="@dimen/padding_layout"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/plot"
@@ -48,7 +49,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_margin_top"
             android:padding="@dimen/padding_layout"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/rating"
@@ -66,7 +68,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_margin_top"
             android:padding="@dimen/padding_layout"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/release"
@@ -84,6 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_margin_top"
             android:padding="@dimen/padding_layout"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:gravity="center" />
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

@@ -119,7 +119,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mFavorite) {
+        if (item.getItemId() == R.id.menu_favorite && mFavorite) {
             boolean removed = false;
             if (mWatchable.getClass() == Movie.class) {
                 removed = mDataBaseHelper.removeMovie((Movie) mWatchable);
@@ -131,7 +131,7 @@ public class DetailActivity extends AppCompatActivity {
                 item.setIcon(R.drawable.ic_favorite_border_white);
                 showToast("Removed from Favorites");
             }
-        } else {
+        } else if (item.getItemId() == R.id.menu_favorite) {
             boolean inserted = false;
             if (mWatchable.getClass() == Movie.class) {
                 inserted = mDataBaseHelper.insertWatchable(mWatchable, DataBaseHelper.MOVIE_TABLE_NAME);
